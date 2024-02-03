@@ -3,7 +3,14 @@
 #include "ESP8266WebServer.h"
 #include "WiFiClient.h"
 #include "SoftwareSerial.h"
+#include <vector>
 
+constexpr int SEND_TIME = 10;
 void handleRoot();
 String getWebpage();
-void sendToArduino(String data);
+void sendLineToArduino(String line);
+void setupHandlers();
+void updateColor();
+void updateBrightness();
+void updateMoving();
+void sendToArduino(std::vector<String> &data);

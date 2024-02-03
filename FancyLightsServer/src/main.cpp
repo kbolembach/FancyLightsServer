@@ -2,6 +2,7 @@
 #include "ESP8266WebServer.h"
 #include "WiFiClient.h"
 #include "SoftwareSerial.h"
+#include <vector>
 
 #include "server.h"
 #include "globals.h"
@@ -23,6 +24,7 @@ IPAddress primaryDNS(91, 90, 160, 4);
 IPAddress secondaryDNS(91, 90, 160, 5);
 ESP8266WebServer server(80);
 
+constexpr unsigned int BAUD_RATE = 19200;
 SoftwareSerial soft_serial(4, 5);
 
 boolean new_data = false;
@@ -30,19 +32,21 @@ const byte num_chars = 32;
 char received_chars[num_chars];
 
 String send_data = "";
+std::vector<String> recent_data = { "m01" };
 String current_color = "#FF0000";
 String received_data = "";
 
 int brightness_value = 255;
+String christmas_moving = "";
 
 //function declarations
 void recvWithStartEndMarkers();
 
 void setup()
 {
-    Serial.begin(19200);
-    soft_serial.begin(19200);
-    delay(10000);
+    Serial.begin(BAUD_RATE);
+    soft_serial.begin(BAUD_RATE);
+    delay(5000);
     Serial.println("ESP8266 ready - serial");
     soft_serial.println("*ESP8266 ready - soft_serial.");
 
@@ -67,47 +71,9 @@ void setup()
     server.begin();
     Serial.println("*HTTP server started");
 
-    server.on("/LED_BUILTIN_on", []() {
-        digitalWrite(LED_BUILTIN, LOW);
-        sendToArduino("<0;1>");
-        Serial.println("LED on.");
-        handleRoot();
-    });
+    sendLineToArduino("It works!");
 
-    server.on("/LED_BUILTIN_off", []() {
-        digitalWrite(LED_BUILTIN, HIGH);
-        sendToArduino("<0;0>");
-        Serial.println("LED off.");
-        handleRoot();
-    });
-
-    server.on("/CHANGE_COLOR", []() {
-    if (server.arg("color") != ""){
-        current_color = server.arg("color");
-        brightness_value = server.arg("brightness").toInt();
-        sendToArduino("<1;COLOR:" + server.arg("color") + ";BRIGHT:" + server.arg("brightness") + ">");
-        Serial.println("Color changed to " + current_color + ", brighness to " + brightness_value + ".");
-        handleRoot();
-    }
-    });
-
-    server.on("/CANDLE_FLICKER", []() {
-    if (server.arg("color") != ""){
-        brightness_value = server.arg("brightness").toInt();
-        sendToArduino("<2;BRIGHT:" + server.arg("brightness") + ">");
-        Serial.println("Candle flicker mode; brightness = " + server.arg("brightness") + ".");
-        handleRoot();
-    }
-    });
-
-    server.on("/CHRISTMAS_LIGHTS", []() {
-    if (server.arg("color" != "")){
-        brightness_value = server.arg("brightness").toInt();
-        sendToArduino("<3;BRIGHT:" + server.arg("brightness") + ">");
-        Serial.println("Christmas lights mode; brightness = " + server.arg("brightness") + ".");
-        handleRoot();
-    }
-    });
+    setupHandlers();
 }
 
 void loop()
