@@ -1,5 +1,6 @@
 #include "ESP8266WiFi.h"
 #include "ESP8266WebServer.h"
+#include "ESP8266mDNS.h"
 #include "WiFiClient.h"
 #include "SoftwareSerial.h"
 #include <vector>
@@ -67,11 +68,18 @@ void setup_wifi(){
     Serial.println("*IP address: ");
     Serial.println(WiFi.localIP());
     server.on( "/", handleRoot);
+
+    if (!MDNS.begin("esp8266")) {
+        Serial.println("Error setting up MDNS responder!");
+        while (1) { delay(1000); }
+    }
+    Serial.println("mDNS responder started");
+
     server.begin();
     Serial.println("*HTTP server started");
 
-    sendLineToArduino("It works!");
-
+    MDNS.addService("http", "tcp", 80);
+    
     setupHandlers();
 }
 
@@ -105,6 +113,7 @@ void setup()
 
 void loop()
 {
+    MDNS.update();
     recvWithStartEndMarkers();
     if (new_data == true)
     {

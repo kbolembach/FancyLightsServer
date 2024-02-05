@@ -1,5 +1,6 @@
 #include "server.h"
 #include "globals.h"
+#include "comm.h"
 #include <vector>
 
 void sendLoginRequest(){
