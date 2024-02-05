@@ -7,6 +7,7 @@
 
 #include "server.h"
 #include "globals.h"
+#include "comm.h"
 
 Preferences preferences;
 
@@ -33,7 +34,7 @@ IPAddress secondaryDNS(91, 90, 160, 5);
 ESP8266WebServer server(80);
 
 constexpr unsigned int BAUD_RATE = 19200;
-SoftwareSerial soft_serial(4, 5);
+SoftwareSerial soft_serial(4, 5); //rx, tx
 
 boolean new_data = false;
 const byte num_chars = 32;

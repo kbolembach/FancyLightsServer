@@ -8,13 +8,8 @@
 constexpr int SEND_TIME = 10;
 void handleRoot();
 String getWebpage();
-void sendLineToArduino(String line);
 void setupHandlers();
 void updateColor();
 void updateBrightness();
 void updateMoving();
 void updateLights();
-void sendLoginRequest();
-void recvWithStartEndMarkers();
-void processData(String data);
-void sendToArduino(std::vector<String> &data);
