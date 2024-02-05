@@ -13,4 +13,8 @@ void setupHandlers();
 void updateColor();
 void updateBrightness();
 void updateMoving();
+void updateLights();
+void sendLoginRequest();
+void recvWithStartEndMarkers();
+void processData(String data);
 void sendToArduino(std::vector<String> &data);

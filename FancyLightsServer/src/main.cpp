@@ -3,18 +3,26 @@
 #include "WiFiClient.h"
 #include "SoftwareSerial.h"
 #include <vector>
+#include <Preferences.h>
 
 #include "server.h"
 #include "globals.h"
 
+Preferences preferences;
+
+String ssid;
+String password;
+boolean is_setup = false;
+long login_request_time;
+
+// char *ssid = "***REMOVED***"; //Enter your WIFI ssid
+// char *password = "***REMOVED***"; //Enter your WIFI password
+
 // char *ssid = "***REMOVED***"; //Enter your WIFI ssid
 // char *password = "***REMOVED***"; //Enter your WIFI password
 
 // char *ssid = "***REMOVED***"; //Enter your WIFI ssid
 // char *password = "***REMOVED***"; //Enter your WIFI password
-
-char *ssid = "***REMOVED***"; //Enter your WIFI ssid
-char *password = "***REMOVED***"; //Enter your WIFI password
 
 IPAddress local_IP(192, 168, 0, 73);
 IPAddress gateway(10, 32, 191, 1);
@@ -37,21 +45,10 @@ String current_color = "#FF0000";
 String received_data = "";
 
 int brightness_value = 255;
-String christmas_moving = "";
+boolean christmas_moving;
+LightMode light_mode;
 
-//function declarations
-void recvWithStartEndMarkers();
-
-void setup()
-{
-    Serial.begin(BAUD_RATE);
-    soft_serial.begin(BAUD_RATE);
-    delay(5000);
-    Serial.println("ESP8266 ready - serial");
-    soft_serial.println("*ESP8266 ready - soft_serial.");
-
-    pinMode(LED_BUILTIN, OUTPUT);
-
+void setup_wifi(){
     // Configures static IP address
     if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
         soft_serial.println("*STA Failed to configure");
@@ -64,6 +61,7 @@ void setup()
         Serial.print(".");
     }
 
+    sendLineToArduino("<LS>"); //Logged in Succesfully
     Serial.println("*WiFi connected");
     Serial.println("*IP address: ");
     Serial.println(WiFi.localIP());
@@ -76,47 +74,58 @@ void setup()
     setupHandlers();
 }
 
-void loop()
+void setup()
 {
-  recvWithStartEndMarkers();
-  if (new_data == true)
-  {
-    String data(received_chars);
-    Serial.println(data);
+    Serial.begin(BAUD_RATE);
+    soft_serial.begin(BAUD_RATE);
+    pinMode(LED_BUILTIN, OUTPUT);
+    delay(5000);
+    Serial.println("ESP8266 ready - serial");
+    soft_serial.println("*ESP8266 ready - soft_serial.");
 
-    new_data = false;
-  }
+    preferences.begin("lights_server", false);
+    ssid = preferences.getString("ssid", "");    
+    password = preferences.getString("password", "");
+    current_color = preferences.getString("color", current_color);
+    brightness_value = preferences.getInt("brightness", 255);
+    // christmas_moving = preferences.getBool("christmas_moving", false);
+    light_mode = static_cast<LightMode>(preferences.getInt("light_mode", 0));
 
-  server.handleClient();
+
+    if (ssid == "" || password == ""){
+        sendLoginRequest();
+        login_request_time = millis();
+    }
+    else {
+        setup_wifi();
+        is_setup = true;
+    }
 }
 
-void recvWithStartEndMarkers(){
-    static boolean recvInProgress = false;
-    static byte ndx = 0;
-    char startMarker = '[';
-    char endMarker = ']';
-    char rc;
- 
-    while (soft_serial.available() > 0 && new_data == false) {
-        rc = soft_serial.read();
+void loop()
+{
+    recvWithStartEndMarkers();
+    if (new_data == true)
+    {
+        String data(received_chars);
+        Serial.println("Data received: " + data);
 
-        if (recvInProgress == true) {
-            if (rc != endMarker) {
-                received_chars[ndx] = rc;
-                ndx++;
-                if (ndx >= num_chars) {
-                    ndx = num_chars - 1;
-                }
-            }
-            else {
-                received_chars[ndx] = '\0'; // terminate the string
-                recvInProgress = false;
-                ndx = 0;
-                new_data = true;
-            }
+        new_data = false;
+        processData(data);
+
+        if (password != "" && ssid != "" && !is_setup){
+            setup_wifi();
+            is_setup = true;
         }
-        else if (rc == startMarker) {
-            recvInProgress = true;
+    }
+
+    if (is_setup){
+        server.handleClient();
+    }
+    else {
+        if (millis() - login_request_time >= 5000){
+            login_request_time = millis();
+            sendLoginRequest();
         }
     }
 }

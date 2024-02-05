@@ -4,9 +4,12 @@
 #include "WiFiClient.h"
 #include "SoftwareSerial.h"
 #include <vector>
+#include <Preferences.h>
 
-extern char *ssid; //Enter your WIFI ssid
-extern char *password; //Enter your WIFI password
+extern Preferences preferences;
+
+extern String ssid; //Enter your WIFI ssid
+extern String password; //Enter your WIFI password
 
 extern IPAddress local_IP;
 extern IPAddress gateway;
@@ -28,4 +31,6 @@ extern String current_color;
 extern String received_data;
 
 extern int brightness_value;
-extern String christmas_moving;
+extern boolean christmas_moving;
+enum LightMode { PLAIN, CANDLE, CHRISTMAS };
+extern LightMode light_mode;
