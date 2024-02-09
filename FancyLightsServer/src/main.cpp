@@ -17,15 +17,6 @@ String password;
 boolean is_setup = false;
 long login_request_time;
 
-// char *ssid = "***REMOVED***"; //Enter your WIFI ssid
-// char *password = "***REMOVED***"; //Enter your WIFI password
-
-// char *ssid = "***REMOVED***"; //Enter your WIFI ssid
-// char *password = "***REMOVED***"; //Enter your WIFI password
-
-// char *ssid = "***REMOVED***"; //Enter your WIFI ssid
-// char *password = "***REMOVED***"; //Enter your WIFI password
-
 IPAddress local_IP(192, 168, 0, 73);
 IPAddress gateway(10, 32, 191, 1);
 
@@ -97,7 +88,7 @@ void setup()
     password = preferences.getString("password", "");
     current_color = preferences.getString("color", current_color);
     brightness_value = preferences.getInt("brightness", 255);
-    // christmas_moving = preferences.getBool("christmas_moving", false);
+    christmas_moving = preferences.getBool("christmas_moving", false);
     light_mode = static_cast<LightMode>(preferences.getInt("light_mode", 0));
 
 
