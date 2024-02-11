@@ -8,8 +8,8 @@
 
 extern Preferences preferences;
 
-extern String ssid; //Enter your WIFI ssid
-extern String password; //Enter your WIFI password
+extern String ssid;
+extern String password;
 
 extern IPAddress local_IP;
 extern IPAddress gateway;
