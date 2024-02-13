@@ -9,7 +9,7 @@ constexpr int SEND_TIME = 10;
 void handleRoot();
 String getWebpage();
 void setupHandlers();
+void updateLights();
 void updateColor();
 void updateBrightness();
 void updateMoving();
-void updateLights();

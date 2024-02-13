@@ -27,8 +27,6 @@ void processData(String data){
 }
 
 void sendLineToArduino(String line){
-    // char* csend_data = (char*) malloc(sizeof(char)*(line.length() + 1));
-    // send_data.toCharArray(csend_data, send_data.length() + 1);
     Serial.println(line);
     soft_serial.println(line);
 }

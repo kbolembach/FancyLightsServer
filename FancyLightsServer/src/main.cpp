@@ -55,8 +55,8 @@ void setup_wifi(){
     }
 
     sendLineToArduino("<LS>"); //Logged in Succesfully
-    Serial.println("*WiFi connected");
-    Serial.println("*IP address: ");
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
     server.on( "/", handleRoot);
 
@@ -67,7 +67,7 @@ void setup_wifi(){
     Serial.println("mDNS responder started");
 
     server.begin();
-    Serial.println("*HTTP server started");
+    Serial.println("HTTP server started");
 
     MDNS.addService("http", "tcp", 80);
     
@@ -81,7 +81,6 @@ void setup()
     pinMode(LED_BUILTIN, OUTPUT);
     delay(5000);
     Serial.println("ESP8266 ready - serial");
-    soft_serial.println("*ESP8266 ready - soft_serial.");
 
     preferences.begin("lights_server", false);
     ssid = preferences.getString("ssid", "");    
